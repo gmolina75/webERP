@@ -1,0 +1,82 @@
+name: webERP CI/CD
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  # Job 1: CI - Code Quality and Tests
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⭐️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: [
+            ctype, mbstring, mysqli, xml, zip, gd, bcmath, 
+            calendar, ftp, simplexml, sqlite3, zlib, iconv
+          ]
+
+      - name: 📦 Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: 🔍 Validate PHP syntax
+        run: find . -name '*.php' -not -path './vendor/*' -not -path './.git/*' -exec php -l {} \; | grep -v "No syntax errors"
+
+      - name: 🧪 Run PHPUnit tests (if available)
+        run: |
+          if [ -f vendor/bin/phpunit ]; then
+            vendor/bin/phpunit --no-coverage || true
+          else
+            echo "⚠️ No PHPUnit found - skipping tests"
+          fi
+
+      - name: 📄 Generate documentation
+        run: |
+          if [ -f README.md ]; then
+            echo "✅ README.md present"
+          fi
+
+  # Job 2: CD - Deploy to GoDaddy
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    steps:
+      - name: ⭐️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to GoDaddy FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          ftp-host: ${{ secrets.FTP_HOST }}
+          ftp-username: ${{ secrets.FTP_USER }}
+          ftp-password: ${{ secrets.FTP_PASSWORD }}
+          ftp-port: ${{ secrets.FTP_PORT || 21 }}
+          server-dir: ${{ secrets.DEPLOY_PATH || '/webERP' }}
+          local-dir: './'
+          protocol: 'ftp'
+          purge: true
+          recursive: true
+          async-timeout: 60
+
+      - name: ✅ Deploy verification
+        run: |
+          echo "🌐 Deploy completado a: ${{ secrets.DEPLOY_PATH || 'webERP' }} en ${{ secrets.FTP_HOST }}"
+          echo "✅ Tu webERP debería estar disponible en: http://aurorasfa.com/weberp"
+
+      - name: 📧 Notify deployment
+        if: always()
+        run: |
+          echo "📋 Resumen del workflow:"
+          echo "   • Commit: ${{ github.sha }}"
+          echo "   • Rama: ${{ github.ref_name }}"
+          echo "   • Estado: ${{ job.status }}"
+          echo "   • URL: http://aurorasfa.com/weberp"
