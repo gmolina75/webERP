@@ -1,107 +1,143 @@
-# [webERP - Accounting and Business Administration ERP System](https://www.weberp.org/)
+# webERP - Accounting & Business Administration ERP System
 
-[![Download](https://img.shields.io/sourceforge/dm/web-erp.svg)](https://sourceforge.net/projects/web-erp/files/latest/download)
-[![Download](https://img.shields.io/sourceforge/dt/web-erp.svg)](https://sourceforge.net/projects/web-erp/files/latest/download)
-[![Build Status](https://github.com/timschofield/webERP/actions/workflows/ci.yaml/badge.svg)](https://github.com/timschofield/webERP/actions/workflows/ci.yaml)
-[![GitHub last commit (master)](https://img.shields.io/github/last-commit/timschofield/webERP/master.svg)](https://github.com/timschofield/webERP/commits/master/)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/timschofield/webERP.svg)](https://github.com/timschofield/webERP/pulls)
+## Overview
 
-## Introduction
+webERP is a complete web-based open-source accounting, business management and ERP (Enterprise Resource Planning) system built for businesses of all sizes. This is the PHP v4.1 version with the initial setup ready for customization and deployment.
 
-webERP is a free open-source ERP system, providing best practise, multi-user business administration and accounting tools
-over the web. For further information and for a full list of features, please visit the support site at: https://www.weberp.org/
+**License:** GPL-2.0-only  
+**Minimum PHP:** ^8.1  
+**Database:** MySQLi (required), MariaDB, PostgreSQL (deprecated)
 
-## Demo
+## Key Features
 
-A live demo of the latest (currently RC) release is available on the webERP support site, where you can log in and experiment
-with all the webERP features: https://www.weberp.org/demo/
+### 🆓 Open Source & Free
+- 100% Free & Open Source under GNU Public License v2
+- No licensing fees, no hidden costs
 
-## Download Now
+### 🌐 Web-Based Access
+- Access from anywhere using any modern browser
+- No software installation required
+- Works on any web server that supports PHP
 
-*NB* the "not yet released" v5 version is recommended over the latest v4 version for new installations. You can
-download the latest daily-updated version from [GitHub](https://github.com/timschofield/webERP/archive/refs/heads/master.zip)
+### 🛠️ Highly Customizable
+- Written in readable PHP code with clear coding standards
+- Modify to fit unique business needs
+- Full source code available for editing
 
-The latest stable version is currently [v4.15.2](https://github.com/timschofield/webERP/releases/tag/v4.15.2), and can
-be downloaded from [SourceForge](http://sourceforge.net/projects/web-erp/files/latest/download)
+### 📦 Comprehensive Module Suite
 
-## Requirements
-- A web server - webERP has been tested on Apache, Nginx, Lighthttpd, and Hiawatha
-- PHP version 8.1 and above
-- MySQL version 5.7.5 and above, or MariaDB version 5.5 and above (recent, supported versions recommended)
-- A web browser with HTML5 compatibility
+#### Accounting & Finance
+- General Ledger with double-entry bookkeeping
+- Trial Balance, Profit & Loss, Balance Sheet reports
+- Bank & Cash reconciliation
+- Multi-currency support with auto-updated exchange rates
+- Standard & Weighted Average Costing
+- Tax management with flexible categories
+- Automated voucher postings and number generation
 
-Further information about hardware and software requirements is available in the [documentation](https://www.weberp.org/Documentation.html)
-on the website.
+#### Inventory & Stock Control
+- Unlimited warehouses/locations
+- Serial and Lot tracking inventory
+- Stock quantity maintenance across multiple locations
+- Stock movement history and traceability
+- Reorder level management
 
-_NB:_ please note that the website documentation is for webERP version 4. For version 5, look at the [included install guide](doc/INSTALL.md)
+#### Sales & Orders
+- Quotations and Sales Orders management
+- Convert quotes to orders upon customer acceptance
+- Multiple price lists and discount support
+- Currency pricing per sales type
+- Order tracking from creation to shipping to invoicing
 
-## Installation
+#### Purchasing
+- Purchase Order creation and management
+- Receive goods with quantity adjustments
+- Supplier billing and payment tracking
+- Vendor performance tracking
 
-### New installation
+#### Manufacturing & Production
+- Multi-level Bills of Materials (BOM)
+- Work Order costing and scheduling
+- MRP (Material Requirements Planning)
+- Production cost roll-up on BOM/component changes
+- Ghost Bills and Kitsets/Assemblies
 
-1. [Download the latest webERP source code](https://github.com/timschofield/webERP/archive/refs/heads/master.zip).
-2. Unzip the downloaded file.
-3. Everything inside the folder you unzipped needs to be uploaded/copied to your webserver, for example, into your
-   `public_html` or `www` or `html` folder (the folder will already exist on your webserver).
-4. Create an empty database, taking note of your username, password, hostname, and database name.
-   NB: the database user must have sufficient permissions to create triggers and functions.
-5. In your browser, enter the address to your site, such as: www.example.com (or if you uploaded it into another subdirectory
-   such as _foldername_ use www.example.com/foldername)
-6. Follow the instructions that appear in your browser for installation.
+#### Customer & Supplier Management
+- Customer accounts with transaction history
+- Supplier accounts with ledger tracking
+- Contact management
+- Payment allocation and tracking
 
-### Upgrading
+#### Analytics & Reporting
+- Sales analysis and customer insights
+- Inventory valuation and stock status
+- Financial reporting (P&L, Balance Sheet, Cash Flow)
+- Custom report generation
+- Graphs and visual data representation
 
-1. [Download the latest webERP source code](https://github.com/timschofield/webERP/archive/refs/heads/master.zip).
-2. Unzip the downloaded file.
-3. Backup the `config.php` script and `companies/` directory from your previous installation.
-4. Everything inside the folder you unzipped needs to be uploaded/copied to your webserver, overwriting your previous installation.
-5. Verify that the `config.php` script and `companies/` directory are intact, and if not, restore them from your backup.
-6. In your browser, enter the address to your site, such as: www.example.com (or if you uploaded it into another subdirectory such as foldername use www.example.com/foldername).
-7. After you log-in, if any database upgrades are required, you will be prompted to install them.
+### 🌍 Multi-Language & Multi-Currency
+- 37+ language support (UTF-8 MB4 character set)
+- Multiple currency support with auto-updated rates
+- Tax rates dependent on product type, location, and customer
 
-Further information about installation and upgrading is available in the [documentation](https://www.weberp.org/demo/ManualContents.php?ViewTopic=GettingStarted).
+### 👥 User Access & Security
+- Role-based access control
+- Login tracking and security logging
+- Module-level permissions
+- Audit trails for all transactions
+
+### 📊 Additional Features
+- PDF report generation (TCPDF & DomPDF)
+- Email functionality (phpmailer integration)
+- Geocoding integration
+- File attachment support (EDI, forms)
+- Dashboard system with customizable widgets
+- Commission tracking for agents
+- Regular payments processing
+- Context-sensitive help system
+- Session management with automatic restoration
+
+### 🔧 Technical Requirements
+- PHP ^8.1 with extensions: ctype, mbstring, mysqli, xml, zip, gd, bcmath, calendar, ftp, simplexml, sqlite3, zlib, iconv
+- MySQL 5.7.5+ or MariaDB 5.5+ (InnoDB required)
+- Web server (Apache HTTP Server or Nginx)
+- Recommended: XAMPP for development Windows platform
+
+### 📦 What's Included in This Repository
+- 2817+ PHP files covering all ERP modules
+- SQL database schema (sql/demo.sql, sql/config.sql)
+- CSS themes (default, xenos, fluid, arc-dark, etc.)
+- JavaScript functionality
+- 37+ language locale files
+- Report writer and form designer
+- MRP/Planning modules
+- Fixed asset management
+- Inventory valuation tools
+- Payment processing modules
+
+## Quick Start
+
+1. **Database Setup:** Create a MySQL/MariaDB database
+2. **Copy Files:** Upload to your web server directory
+3. **Configure:** Edit config.distrib.php → config.php with DB credentials
+4. **Install:** Access via browser and run web installer
+5. **Setup Company:** Copy companies/weberpdemo to companies/yourcompany
+6. **Login:** Use admin/weberp credentials (change default password)
 
 ## Documentation
+- CHANGELOG.md - Complete change history
+- INSTALL.md - Detailed installation instructions
+- UPGRADING.md - Upgrade guide
+- README.md - This file
 
-The webERP user documentation is included in every installation, and can be accessed by clicking on the `Manual` button on the
-top menu bar. The documentation is also available within the [live demo.](https://www.weberp.org/demo/ManualContents.php)
+## Development
+- Follow PHP coding standards in the existing codebase
+- Use Composer for dependency management
+- Test changes in a development environment first
+- Respect the multi-language locale structure
 
-The developer's documentation is also included in every installation, in markdown format. It is found in `./doc/developers/`.
-It can be browsed online at https://github.com/timschofield/webERP/tree/master/doc/developers
+## Contributing
+This is the starting point for webERP customization. Fork the repository, create branches for features, and submit pull requests.
 
-## Support
-
-Free support is available 24/7, provided by our enthusiastic community of actual webERP users, integrators, and the developers themselves.
-
-The primary means of support is through the forum at: https://github.com/timschofield/webERP/discussions
-
-You may also join the mailing list at: https://sourceforge.net/projects/web-erp/lists/web-erp-users
-
-The answers to most questions can be found by searching the forums, or the mailing list archives at: https://sourceforge.net/p/web-erp/mailman/
-
-## Contribute to the webERP project
-
-Contributions of code and documentation including How-Tos with screenshots etc... are very much appreciated. If your business
-has done such training materials for your own team this will no doubt be useful to many others and a productive way that
-you could contribute. Contributions in the form of bug reports or other feedback through the forums or mailing lists above
-also help to improve the project.
-
-General guidelines for contributing code can be found at: https://www.weberp.org/Development.html
-
-The docs at https://github.com/timschofield/webERP/tree/master/doc/developers include a Code of Conduct as well as
-Coding Standards and a detailed Development Workflow.
-Developers interested in contributing should read those document carefully and follow the guidelines therein. Standards and
-conventions used in the code are rigorously applied in the interests of consistency and readability.
-
-## Legal
-
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; version 2 of the License.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-A copy of the GNU General Public License is included in the doc directory along with this program; if not, write to the
-Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-Copyright © weberp.org 2003-2025 - Contact: info@weberp.org
+---
+*Initialized from webERP v4.1 source code. For latest features and updates, visit https://www.weberp.org/*
