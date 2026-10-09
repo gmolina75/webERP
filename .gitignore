@@ -1,0 +1,40 @@
+# PHP Composer dependencies
+vendor/
+
+# Configuration files (will be created at install time)
+config.php
+
+# Installer directory - remove after installation
+install/
+
+# Database backups and SQL dumps (keep demo.sql only)
+*.sql
+
+# Log files
+logs/
+
+# Session files
+*.sess
+
+# Environment files
+.env
+
+# Cache directories
+.cache/
+
+# Node/npm stuff
+node_modules/
+npm-debug.log*
+
+# IDE and editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/

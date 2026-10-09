@@ -1,0 +1,229 @@
+<?php
+/* Definition of the Offer class to hold all the information for a supplier offer
+*/
+
+
+class Offer {
+
+	var $LineItems; /*array of objects of class LineDetails using the product id as the pointer */
+	var $TenderID;
+	var $CurrCode;
+	var $Location;
+	var $SupplierID;
+	var $SupplierName;
+	var $EmailAddress;
+	var $LinesOnOffer;
+	var $Version;
+	var $OfferMailText;
+
+	function __construct($Supplier){
+	/*Constructor function initialises a new purchase offer object */
+		$this->LineItems = array();
+		$this->total = 0;
+		$this->LinesOnOffer = 0;
+		$this->SupplierID = $Supplier;
+		$SQL = "SELECT suppname,
+					email,
+					currcode
+				FROM suppliers
+				WHERE supplierid='" . $this->SupplierID . "'";
+		$Result = DB_query($SQL);
+		$MyRow = DB_fetch_array($Result);
+		$this->SupplierName = $MyRow['suppname'];
+		$this->EmailAddress = $MyRow['email'];
+		$this->CurrCode = $MyRow['currcode'];
+	}
+	function Offer($Supplier) {
+		self::__construct($Supplier);
+	}
+
+	function add_to_offer($LineNo,
+							$StockID,
+							$Qty,
+							$ItemDescr,
+							$Price,
+							$UOM,
+							$DecimalPlaces,
+							$ExpiryDate){
+
+		if (isset($Qty) and $Qty != 0){
+
+			$this->LineItems[$LineNo] = new LineDetails($LineNo,
+														$StockID,
+														$Qty,
+														$ItemDescr,
+														$Price,
+														$UOM,
+														$DecimalPlaces,
+														$ExpiryDate);
+			$this->LinesOnOffer++;
+			return 1;
+		}
+		return 0;
+	}
+
+	function GetSupplierName() {
+		return $this->SupplierName;
+	}
+
+	function GetSupplierEmail() {
+		return $this->EmailAddress;
+	}
+
+	function Save($Update = '') {
+		if ($Update == '') {
+			foreach ($this->LineItems as $LineItems) {
+				if ($LineItems->Deleted == false) {
+					$SQL = "INSERT INTO offers (	supplierid,
+												tenderid,
+												stockid,
+												quantity,
+												uom,
+												price,
+												expirydate,
+												currcode)
+						VALUES ('" . $this->SupplierID . "',
+								'" . $this->TenderID . "',
+								'" . $LineItems->StockID . "',
+								'" . $LineItems->Quantity . "',
+								'" . $LineItems->Units . "',
+								'" . $LineItems->Price . "',
+								'" . FormatDateForSQL($LineItems->ExpiryDate) . "',
+								'" . $this->CurrCode . "')";
+					$ErrMsg = __('The suppliers offer could not be inserted into the database because');
+					$Result = DB_query($SQL, $ErrMsg, '', true);
+					if (DB_error_no() == 0) {
+						prnMsg(__('The offer for') . ' ' . $LineItems->StockID . ' ' . __('has been inserted into the database'), 'success');
+						$this->OfferMailText .= $LineItems->Quantity . ' ' . $LineItems->Units . ' ' . __('of') . ' ' .
+							$LineItems->StockID . ' ' . __('at a price of') . ' ' . $this->CurrCode .
+							number_format($LineItems->Price, 2) . "\n";
+					} else {
+						prnMsg(__('The offer for') . ' ' . $LineItems->StockID . ' ' . __('could not be inserted into the database'), 'error');
+						include('includes/footer.php');
+						exit();
+					}
+				}
+			}
+		} else {
+			foreach ($this->LineItems as $LineItem) {
+				if ($LineItem->Deleted == false){ //Update only the LineItems which is not flagged as deleted
+					$SQL = "UPDATE offers SET
+							quantity='" . $LineItem->Quantity . "',
+							price='" . $LineItem->Price . "',
+							expirydate='" . FormatDateForSQL($LineItem->ExpiryDate) . "'
+						WHERE offerid='" . $LineItem->LineNo . "'";
+					$ErrMsg = __('The suppliers offer could not be updated on the database because');
+					$Result = DB_query($SQL, $ErrMsg, '', true);
+					if (DB_error_no() == 0) {
+						prnMsg(__('The offer for') . ' ' . $LineItem->StockID . ' ' . __('has been updated in the database'), 'success');
+						$this->OfferMailText .= $LineItem->Quantity . ' ' . $LineItem->Units . ' ' . __('of') . ' ' .
+							$LineItem->StockID . ' ' . __('at a price of') . ' ' . $this->CurrCode . $LineItem->Price . "\n";
+					} else {
+						prnMsg(__('The offer for') . ' ' . $LineItem->StockID . ' ' . __('could not be updated in the database'), 'error');
+						include('includes/footer.php');
+						exit();
+					}
+				} else { // the LineItem is Deleted flag is true so delete it
+					$SQL = "DELETE from offers WHERE offerid='" . $LineItem->LineNo . "'";
+					$ErrMsg = __('The supplier offer could not be deleted on the database because');
+					$Result = DB_query($SQL, $ErrMsg, '', true);
+					if (DB_error_no() == 0) {
+						prnMsg(__('The offer for') . ' ' . $LineItem->StockID . ' ' . __('has been deleted in the database'), 'info');
+						$this->OfferMailText .= $LineItem->Quantity . ' ' . $LineItem->Units . ' ' . __('of') . ' ' .
+							$LineItem->StockID . ' ' . __('at a price of') . ' ' . $this->CurrCode .
+							$LineItem->Price . ' ' . __('has been deleted') . "\n";
+					}
+				}
+			}
+		}
+	}
+
+	function EmailOffer() {
+		$Subject = (__('Offer received from') . ' ' . $this->GetSupplierName());
+		$Message = (__('This email is automatically generated by webERP') . "\n" .
+			__('You have received the following offer from') . ' ' . $this->GetSupplierName() . "\n\n" . $this->OfferMailText);
+
+		$Result = SendEmailFromWebERP($this->GetSupplierEmail(),
+									array($this->EmailAddress, $_SESSION['PurchasingManagerEmail']),
+									$Subject,
+									$Message,
+									'',
+									false);
+
+		return $Result;
+	}
+
+	function update_offer_item($LineNo,
+								$Qty,
+								$Price,
+								$ExpiryDate){
+
+			$this->LineItems[$LineNo]->Quantity = $Qty;
+			$this->LineItems[$LineNo]->Price = $Price;
+			$this->LineItems[$LineNo]->ExpiryDate = $ExpiryDate;
+	}
+
+	function remove_from_offer($LineNo){
+		$this->LineItems[$LineNo]->Deleted = true;
+	}
+
+
+	function Offer_Value() {
+		$TotalValue = 0;
+		foreach ($this->LineItems as $OrderedItems) {
+			$TotalValue += ($OrderedItems->Price) * ($OrderedItems->Quantity);
+		}
+		return $TotalValue;
+	}
+} /* end of class defintion */
+
+class LineDetails {
+/* PurchOrderDetails */
+	var $LineNo;
+	var $StockID;
+	var $ItemDescription;
+	var $Quantity;
+	var $Price;
+	var $Units;
+	var $DecimalPlaces;
+	var $Deleted;
+	var $ExpiryDate;
+
+	function __construct($LineNo,
+							$StockItem,
+							$Qty,
+							$ItemDescr,
+							$Price,
+							$UOM,
+							$DecimalPlaces,
+							$ExpiryDate) {
+
+	/* Constructor function to add a new LineDetail object with passed params */
+		$this->LineNo = $LineNo;
+		$this->StockID = $StockItem;
+		$this->ItemDescription = $ItemDescr;
+		$this->Quantity = $Qty;
+		$this->Price = $Price;
+		$this->Units = $UOM;
+		$this->DecimalPlaces = $DecimalPlaces;
+		$this->ExpiryDate = $ExpiryDate;
+		$this->Deleted = false;
+	}
+	function LineDetails($LineNo,
+							$StockItem,
+							$Qty,
+							$ItemDescr,
+							$Price,
+							$UOM,
+							$DecimalPlaces,
+							$ExpiryDate) {
+		self::__construct($LineNo,
+							$StockItem,
+							$Qty,
+							$ItemDescr,
+							$Price,
+							$UOM,
+							$DecimalPlaces,
+							$ExpiryDate);
+	}
+}
