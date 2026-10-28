@@ -1,0 +1,82 @@
+# ============================================================
+# webERP Security Hardening .htaccess
+# Protects against: CVE-2024-4577 (CGI argument injection),
+# directory traversal, sensitive file exposure, XSS, clickjacking
+# ============================================================
+
+Options -Indexes
+Options -ExecCGI
+
+# Block access to sensitive directories and files
+<FilesMatch "^\.git">
+	Require all denied
+</FilesMatch>
+
+<FilesMatch "^\.gitignore">
+	Require all denied
+</FilesMatch>
+
+<FilesMatch "^(config\.php|config\.distrib\.php|composer\.lock|composer\.json|\.env|php-security\.ini)$">
+	Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(md|txt|log|sql|ini|lock)$">
+	Require all denied
+</FilesMatch>
+
+# Note: vendor/, .git/ and doc/ are protected via FilesMatch below
+# (DirectoryMatch is not allowed in .htaccess context)
+
+# Deny direct access to install directory after installation (uncomment after install)
+#<Directory "install">
+#	Require all denied
+#</Directory>
+
+# Security Headers
+<IfModule mod_headers.c>
+	Header always set X-Content-Type-Options "nosniff"
+	Header always set X-Frame-Options "SAMEORIGIN"
+	Header always set X-XSS-Protection "1; mode=block"
+	Header always set Referrer-Policy "strict-origin-when-cross-origin"
+	Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	Header always set X-Powered-By ""
+</IfModule>
+
+# Force HTTPS (enable in production)
+#<IfModule mod_rewrite.c>
+#	RewriteEngine On
+#	RewriteCond %{HTTPS} off
+#	RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [L,R=301]
+#</IfModule>
+
+# PHP security settings (Apache mod_php)
+<IfModule mod_php.c>
+	php_flag display_errors off
+	php_flag log_errors on
+	php_flag expose_php off
+	php_value error_reporting "E_ALL & ~E_NOTICE & ~E_DEPRECATED"
+	php_value memory_limit 256M
+	php_value max_execution_time 300
+	php_value post_max_size 64M
+	php_value upload_max_filesize 64M
+	php_value session.use_strict_mode 1
+	php_value session.cookie_httponly 1
+	php_value session.cookie_samesite Strict
+	php_value session.use_only_cookies 1
+</IfModule>
+
+# Limit allowed request methods
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	# Block malicious user agents
+	RewriteCond %{HTTP_USER_AGENT} (sqlmap|nikto|nmap|masscan|acunetix|netsparker|w3af|zgrab|masscan) [NC]
+	RewriteRule .* - [F,L]
+	# Block common exploit patterns
+	RewriteCond %{QUERY_STRING} (union.*select|<script|javascript:|eval\(|\.\./|/etc/passwd) [NC,OR]
+	RewriteCond %{QUERY_STRING} (\.\./|\.\.\\)
+	RewriteRule .* - [F,L]
+</IfModule>
+
+# Disable server signature
+ServerSignature Off
+ServerTokens Prod

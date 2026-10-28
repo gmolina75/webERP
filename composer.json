@@ -14,11 +14,14 @@
 	],
 	"_note": "the mysqli extension is required by the installer. Once we add to it support for pgsql and pdo, it can be demoted to suggested",
 	"require": {
-		"php": "^8.1",
+		"php": "^8.3",
 		"ext-ctype": "*",
 		"ext-mbstring": "*",
 		"ext-mysqli": "*",
 		"ext-xml": "*",
+		"ext-dom": "*",
+		"ext-json": "*",
+		"ext-simplexml": "*",
 		"dompdf/dompdf": "^3.1",
 		"gggeek/barcodepack": "^1.0.1",
 		"gggeek/polyfill-gettext": "dev-main as 1.99.99",
@@ -63,7 +66,7 @@
 	"_comment_2": "Since we ship dependecies, force Composer not to download anything which requires a bigger php version",
 	"config": {
 		"platform": {
-			"php": "8.1.0"
+			"php": "8.3.0"
 		}
 	}
 }

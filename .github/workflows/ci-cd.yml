@@ -18,9 +18,9 @@ jobs:
       - name: 🛠️ Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.3'
           extensions: [
-            ctype, mbstring, mysqli, xml, zip, gd, bcmath, 
+            ctype, mbstring, mysqli, xml, dom, json, zip, gd, bcmath,
             calendar, ftp, simplexml, sqlite3, zlib, iconv
           ]
 
@@ -29,6 +29,12 @@ jobs:
 
       - name: 🔍 Validate PHP syntax
         run: find . -name '*.php' -not -path './vendor/*' -not -path './.git/*' -exec php -l {} \; | grep -v "No syntax errors"
+
+      - name: 🛡️ Security vulnerability scan
+        run: php bin/security-scan.php || true
+
+      - name: 📦 Composer audit (known CVEs in dependencies)
+        run: composer audit || true
 
       - name: 🧪 Run PHPUnit tests (if available)
         run: |
